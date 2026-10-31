@@ -97,7 +97,7 @@ h1,h2,h3,.product h3,.cart-line h3,dialog h2,.social-highlights h3{font-family:v
 .signature-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:#111013bb;padding:5px 9px;font-size:10px;letter-spacing:1px}
 
 /* Vista ampliada de las fotografías de Signature */
-.signature-gallery img:not([hidden]){cursor:zoom-in}
+.product .photo img:not([hidden]){cursor:zoom-in}
 #signature-lightbox{padding:0;border:0;background:transparent;color:white;width:min(96vw,1100px);max-width:1100px;max-height:96dvh;overflow:visible}
 #signature-lightbox::backdrop{background:rgba(0,0,0,.92)}
 .signature-lightbox-inner{position:relative;display:flex;align-items:center;justify-content:center;min-height:180px}
@@ -165,21 +165,47 @@ document.querySelectorAll('.signature-gallery').forEach(gallery=>{
   show(0);
 });
 
-/* Visor ampliado Signature */
+/* Visor ampliado para todos los productos con fotografía. */
 (()=>{
-const gallery=document.querySelector('.signature-gallery'),lightbox=document.querySelector('#signature-lightbox');
-if(!gallery||!lightbox)return;
-const photos=[...gallery.querySelectorAll('img')],enlarged=lightbox.querySelector('#signature-lightbox-image');
-let index=0,startX=null;
-function display(n){index=(n+photos.length)%photos.length;enlarged.src=photos[index].getAttribute('src');enlarged.alt=photos[index].alt;lightbox.querySelector('.signature-lightbox-count').textContent=String(index+1).padStart(2,'0')+' / '+String(photos.length).padStart(2,'0')}
-photos.forEach((photo,i)=>photo.addEventListener('click',()=>{display(i);lightbox.showModal()}));
+const lightbox=document.querySelector('#signature-lightbox');
+if(!lightbox)return;
+const enlarged=lightbox.querySelector('#signature-lightbox-image');
+const prev=lightbox.querySelector('.signature-lightbox-prev');
+const next=lightbox.querySelector('.signature-lightbox-next');
+const count=lightbox.querySelector('.signature-lightbox-count');
+let photos=[],index=0,startX=null;
+function display(n){
+  index=(n+photos.length)%photos.length;
+  enlarged.src=photos[index].getAttribute('src');
+  enlarged.alt=photos[index].alt;
+  count.textContent=String(index+1).padStart(2,'0')+' / '+String(photos.length).padStart(2,'0');
+  prev.hidden=next.hidden=photos.length<2;
+}
+document.querySelectorAll('.product .photo').forEach(gallery=>{
+  const images=[...gallery.querySelectorAll('img')];
+  if(!images.length)return;
+  images.forEach((photo,i)=>photo.addEventListener('click',()=>{
+    photos=images;
+    display(i);
+    lightbox.showModal();
+  }));
+});
 lightbox.querySelector('.signature-lightbox-close').addEventListener('click',()=>lightbox.close());
-lightbox.querySelector('.signature-lightbox-prev').addEventListener('click',()=>display(index-1));
-lightbox.querySelector('.signature-lightbox-next').addEventListener('click',()=>display(index+1));
-lightbox.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();display(index+(e.key==='ArrowRight'?1:-1))}});
+prev.addEventListener('click',()=>display(index-1));
+next.addEventListener('click',()=>display(index+1));
+lightbox.addEventListener('keydown',e=>{
+  if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&photos.length>1){
+    e.preventDefault();display(index+(e.key==='ArrowRight'?1:-1));
+  }
+});
 lightbox.addEventListener('click',e=>{if(e.target===lightbox)lightbox.close()});
 enlarged.addEventListener('touchstart',e=>{startX=e.changedTouches[0].clientX},{passive:true});
-enlarged.addEventListener('touchend',e=>{if(startX===null)return;const delta=e.changedTouches[0].clientX-startX;if(Math.abs(delta)>45)display(index+(delta<0?1:-1));startX=null},{passive:true});
+enlarged.addEventListener('touchend',e=>{
+  if(startX===null)return;
+  const delta=e.changedTouches[0].clientX-startX;
+  if(Math.abs(delta)>45&&photos.length>1)display(index+(delta<0?1:-1));
+  startX=null;
+},{passive:true});
 })();
 </script></body></html>
 
