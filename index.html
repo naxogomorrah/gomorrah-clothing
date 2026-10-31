@@ -102,7 +102,7 @@ h1,h2,h3,.product h3,.cart-line h3,dialog h2,.social-highlights h3{font-family:v
 const items=[['Ritual','ritual','polera',18000,'Gráfica roja'],['Covenant','covenant','polera',18000,'Gráfica morada'],['Ascension','ascension','polera',18000,'Gráfica blanca'],['Cathedral','cathedral','poleron',35000,'Polerón con capucha']];const money=n=>'$'+n.toLocaleString('es-CL')+' CLP';document.querySelector('#products').innerHTML=items.map(([name,img,type,price,detail],i)=>`<article class="product" data-name="${name}" data-price="${price}" data-type="${type}"><div class="photo"><img src="${img}.webp" alt="${name}, prenda Gomorrah negra con ${detail.toLowerCase()}" loading="lazy"><span class="tag">DARKWORKS I / 0${i+1}</span></div><div class="product-top"><h3>${name}</h3><span class="price">${money(price)}</span></div><p>${type==='polera'?'Polera':detail} · ${type==='polera'?detail:'Negro'}</p><div class="sizes" aria-label="Talla de ${name}"></div><button class="order">Pídelo aquí <span>↗</span></button></article>`).join('');
 /* Stock por producto: agrega tallas agotadas al arreglo correspondiente. */
 const soldOutSizes={
-  Ritual:['XL','XXL'],
+  Ritual:['M','XL','XXL'],
   Covenant:['XL','XXL'],
   Ascension:['XL','XXL'],
   Cathedral:[],
